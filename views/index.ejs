@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <style>
+      #weatherContainer {
+          display: flex;
+      }
+
+      #weatherTable {
+          flex: 1; /* Take up all available space */
+      }
+
+      .map-container {
+          flex: 2; /* Take up twice the space of the table */
+          padding-left: 20px; /* Add padding to separate from the table */
+      }
+
+      #map {
+          height: 600px;
+      }
+      .weather-icon {
+        width: 30px; /* Adjust the width as needed */
+        height: 30px; /* Adjust the height as needed */
+      }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">WeatherApp</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/forecast">Forecast</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/maps">Weather Maps</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/tips">Weather Tips</a>
+            </li>
+          </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12 col-md-6 mx-auto text-center">
+            <form id="weatherForm" action="/" method="post">
+              <input type="text" id="cityName" name="cityName" placeholder="Enter city name" required>
+              <button type="submit">Get Weather</button>
+            </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" id="weatherContainer">
+      <div id="weatherTable">
+          <div class="card">
+              <div class="card-body">
+                  <h5 class="card-title" id="weatherCity">Weather in City Name</h5>
+                  <p class="card-text" id="weatherDescription">Weather description goes here...</p>
+                  <!-- Add more weather details here -->
+              </div>
+              <ul class="list-group list-group-flush">
+                  <li class="list-group-item" id="weatherTemperature">Temperature: --</li>
+                  <li class="list-group-item" id="weatherWind">Wind: --</li>
+                  <li class="list-group-item" id="weatherHumidity">Humidity: --</li>
+                  <li class="list-group-item" id="weatherPressure">Pressure: --</li>
+                  <li class="list-group-item" id="weatherClouds">Cloudiness: --</li>
+                  <li class="list-group-item" id="weatherSunrise">Sunrise: --</li>
+                  <li class="list-group-item" id="weatherSunset">Sunset: --</li>
+              </ul>
+          </div>
+      </div>
+
+      <div class="card mb-3 map-container">
+          <div class="card-header">
+              Map
+          </div>
+          <div id="map"></div>
+      </div>
+    </div>
+
+  <div class="card mb-3">
+    <div class="card-header">
+      Weatherbit Data
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item" id="weatherbitTemperature">Temperature (Weatherbit): --</li>
+      <li class="list-group-item" id="weatherbitDescription">Description (Weatherbit): --</li>
+      <!-- Add more list items for additional Weatherbit data -->
+    </ul>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header">
+      Tomorrow.io Weather Data
+    </div>
+    <div class="card-body">
+      <h5 class="card-title" id="tomorrowIoTemperature">Temperature (Tomorrow.io): --</h5>
+    </div>
+  </div>
+
+  <div class="container" id="weatherContainer">
+    <% if (data && data.data && data.data.length > 0) { %>
+      <table class="table">
+        <thead>
+          <% data.data.forEach((day, index) => { %>
+            <tr>
+              <td>Valid date</td>
+              <td>Minimum temperature(°C) / Maximum temperature(°C)</td>
+              <td>Wind speed (m/s)</td>
+              <td>Relative Humidity</td>
+              <td>Weather Icon</td>
+            </tr>
+          <% }); %>
+        </thead>
+        <tbody id="forecastTableBody">
+          <!-- Forecast data rows will be added here -->
+        </tbody>
+      </table>
+    <% } else { %>
+      <!-- Show a message or loading spinner here when no data is available -->
+      <p>No weather data available.</p>
+    <% } %>
+  </div>
+  
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/script.js"></script>
+    <script>
+      document.getElementById('weatherForm').addEventListener('submit', function (event) {
+          event.preventDefault();
+          const city = document.getElementById('cityName').value;
+          fetchWeather(city); // Fetch current weather data
+          fetch14DayWeatherForecast(city); // Fetch 14-day forecast data and populate the table
+      });
+    </script>
+</body>
+</html>
