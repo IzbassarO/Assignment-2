@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+        header, footer {
+            background-color: #007bff;
+            color: white;
+        }
+        footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: auto; 
+            padding: 10px 0; 
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #28a745;
+        }
+        .btn-outline-light {
+            margin: 0 5px;
+        }
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .author-image {
+            max-width: 200px; 
+            height: auto;
+            border-radius: 50%; 
+            display: block; 
+            margin: 0 auto; 
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">WeatherApp</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Main <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="/about">About</a>
+            </li>
+          </ul>
+        </div>
+    </nav>
+      
+    <!-- Header -->
+    <header class="bg-primary text-white text-center p-3">
+        <p>Author: Izbassar Orynbassar from SE-2202</p>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mx-auto">
+                <!-- Author's Image -->
+                <img src="author.jpg" alt="Author Image" class="img-fluid rounded-circle mb-3 author-image">
+
+                <div class="text-center">
+                    <h2>Izbassar Orynbassar</h2>
+                    <p>Student of Astana IT University</p>
+                    <p>Specializations: Back End, Mobile Dev</p>
+                    <p>2nd course, Software Engineer, SE - 2202</p>
+                    <a href="mailto:221049@astanait.edu.kz">221049@astanait.edu.kz</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-primary text-white text-center p-3">
+        <div class="footer-content">
+            <p>&copy; 2023 Izbassar Orynbassar</p>
+            <p>SE-2202</p>
+            <div>
+                <a href="your-website-url" class="btn btn-outline-light btn-sm">Website</a>
+                <a href="your-app-url" class="btn btn-outline-light btn-sm">App</a>
+                <a href="https://instagram.com/yourusername" class="btn btn-outline-light btn-sm">Instagram</a>
+                <a href="https://t.me/yourusername" class="btn btn-outline-light btn-sm">Telegram</a>
+            </div>
+            <div>
+                <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#infoModal">More Info</button>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Info Modal -->
+    <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel">Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Here you can add additional information about the Weather, weather tips, contact information, or other relevant content.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
