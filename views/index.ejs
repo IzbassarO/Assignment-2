@@ -42,28 +42,34 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="/">WeatherApp</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav2" aria-controls="navbarNav2" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="/">Main <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/about">About</a>
-        </li>
-      </ul>
+    <div class="collapse navbar-collapse" id="navbarNav2">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/">Main <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/searchlogs">History</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+        </ul>
     </div>
-</nav>
+  </nav>
 
     <div class="container">
       <div class="row">
         <div class="col-12 col-md-6 mx-auto text-center">
-            <form id="weatherForm" action="/" method="post">
-              <input type="text" id="cityName" name="cityName" placeholder="Enter city name" required>
-              <button type="submit">Get Weather</button>
-            </form>
+          <form id="weatherForm" action="/" method="post">
+            <input type="text" id="cityName" name="cityName" placeholder="Enter city name" required>
+            <button type="submit">Get Weather</button>
+          </form>
         </div>
       </div>
     </div>
@@ -74,7 +80,6 @@
               <div class="card-body">
                   <h5 class="card-title" id="weatherCity">Weather in City Name</h5>
                   <p class="card-text" id="weatherDescription">Weather description goes here...</p>
-                  <!-- Add more weather details here -->
               </div>
               <ul class="list-group list-group-flush">
                   <li class="list-group-item" id="weatherTemperature">Temperature: --</li>
@@ -103,7 +108,6 @@
     <ul class="list-group list-group-flush">
       <li class="list-group-item" id="weatherbitTemperature">Temperature (Weatherbit): --</li>
       <li class="list-group-item" id="weatherbitDescription">Description (Weatherbit): --</li>
-      <!-- Add more list items for additional Weatherbit data -->
     </ul>
   </div>
 
@@ -131,20 +135,50 @@
           <% }); %>
         </thead>
         <tbody id="forecastTableBody">
-          <!-- Forecast data rows will be added here -->
         </tbody>
       </table>
     <% } else { %>
-      <!-- Show a message or loading spinner here when no data is available -->
       <p>No weather data available.</p>
     <% } %>
   </div>
   <br><br><br><br><br><br><br><br><br><br>
-  
-    <footer class="bg-primary text-white text-center">
-      <p>&copy; 2024 WeatherApp      student: Izbassar Orynbassar, SE-2202</p>
-      <p>Powered by OpenWeatherAPI, Weatherbit, and Tomorrow.io</p>
-    </footer>
+
+  <footer class="bg-primary text-white text-center p-3">
+    <div class="footer-content">
+        <p>&copy; 2024 WeatherApp      student: Izbassar Orynbassar, SE-2202</p>
+        <p>Powered by OpenWeatherAPI, Weatherbit, and Tomorrow.io</p>
+        <div>
+            <a href="your-website-url" class="btn btn-outline-light btn-sm">Website</a>
+            <a href="your-app-url" class="btn btn-outline-light btn-sm">App</a>
+            <a href="https://instagram.com/yourusername" class="btn btn-outline-light btn-sm">Instagram</a>
+            <a href="https://t.me/yourusername" class="btn btn-outline-light btn-sm">Telegram</a>
+        </div>
+        <div>
+            <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#infoModal">More Info</button>
+        </div>
+    </div>
+  </footer>
+
+    <!-- Info Modal -->
+    <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="infoModalLabel">Information</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  Here you can add additional information about the BMI Calculator, health tips, contact information, or other relevant content.
+              </div>
+          </div>
+      </div>
+  </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>

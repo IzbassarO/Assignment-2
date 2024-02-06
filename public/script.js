@@ -28,29 +28,22 @@ function displayWeatherData(data) {
     document.getElementById('weatherSunrise').textContent = `Sunrise: ${new Date(data.sys.sunrise * 1000).toLocaleTimeString()}`;
     document.getElementById('weatherSunset').textContent = `Sunset: ${new Date(data.sys.sunset * 1000).toLocaleTimeString()}`;
 
-    // Once we have the city name, fetch Weatherbit data
     fetchWeatherbitData(data.name);
 
-    // Fetch AQICN data using latitude and longitude
     fetchAQIData(data.coord.lat, data.coord.lon);
 
-    // Fetch Tomorrow.io data using latitude and longitude
     fetchTomorrowIoData(data.coord.lat, data.coord.lon);
 
-    // Initialize map with the location
     initMap(data.coord.lat, data.coord.lon);
 }
 
 function displayWeatherbitData(data) {
   document.getElementById('weatherbitTemperature').textContent = `Temperature (Weatherbit): ${data.data[0].temp}°C`;
   document.getElementById('weatherbitDescription').textContent = `Description (Weatherbit): ${data.data[0].weather.description}`;
-  // Add more elements as required
 
-  // Use the weather code to get the corresponding icon URL
   const iconCode = data.data[0].weather.icon;
   const iconUrl = `https://www.weatherbit.io/static/img/icons/${iconCode}.png`;
 
-  // Set the icon image
   document.getElementById('weatherbitIcon').src = iconUrl;
   document.getElementById('weatherbitIcon').alt = data.data[0].weather.description;
 
@@ -58,8 +51,7 @@ function displayWeatherbitData(data) {
 
 
 function displayAQIData(data) {
-  // Assuming 'data' is the response from AQICN
-  // Update your HTML elements with AQICN data
+
 }
 
 function fetchWeatherbitData(city) {
@@ -186,3 +178,15 @@ function displayWeatherIcons(forecastData) {
       document.getElementById(`weatherIcon${day.id}`).src = iconUrl;
   });
 }
+
+document.getElementById('weatherForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const city = document.getElementById('cityName').value;
+  axios.post('/search-weather', { cityName: city })
+    .then(response => {
+      // Update your UI based on the response
+    })
+    .catch(error => {
+      console.error("Error submitting weather search:", error);
+    });
+});
