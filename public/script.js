@@ -182,7 +182,7 @@ document.getElementById('weatherForm').addEventListener('submit', function(event
   const city = document.getElementById('cityName').value;
   axios.post('/search-weather', { cityName: city })
     .then(response => {
-      // Update your UI based on the response
+      // Update UI
     })
     .catch(error => {
       console.error("Error submitting weather search:", error);

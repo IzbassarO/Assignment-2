@@ -6,7 +6,7 @@ const logSchema = new mongoose.Schema({
   username: String,
   citySearched: String,
   searchTime: Date,
-  weatherData: Object // or specific fields as per your requirement
+  weatherData: Object
 });
 
 const SearchLog = mongoose.model('SearchLog', logSchema);

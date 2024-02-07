@@ -12,20 +12,20 @@
       }
 
       #weatherTable {
-          flex: 1; /* Take up all available space */
+          flex: 1;
       }
 
       .map-container {
-          flex: 2; /* Take up twice the space of the table */
-          padding-left: 20px; /* Add padding to separate from the table */
+          flex: 2; 
+          padding-left: 20px;
       }
 
       #map {
           height: 600px;
       }
       .weather-icon {
-        width: 30px; /* Adjust the width as needed */
-        height: 30px; /* Adjust the height as needed */
+        width: 30px;
+        height: 30px;
       }
       footer {
           position: fixed;
@@ -72,7 +72,7 @@
       <div class="row">
         <div class="col-12 col-md-6 mx-auto text-center">
           <form id="weatherForm" action="/" method="post">
-            <input type="text" id="cityName" name="cityName" placeholder="Enter city name" required>
+            <input type="text" id="cityName" name="cityName" placeholder="Enter city name" <% if (isAdmin) { %>disabled<% } %> required>
             <button type="submit">Get Weather</button>
           </form>
         </div>
@@ -146,6 +146,26 @@
       <p>No weather data available.</p>
     <% } %>
   </div>
+
+<div class="modal fade" id="adminAlertModal" tabindex="-1" role="dialog" aria-labelledby="adminAlertModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="adminAlertModalLabel">Admin Action</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Admins cannot perform weather searches. Blame the developer Izbassar that wanted so :)
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   <br><br><br><br><br><br><br><br><br><br>
 
   <footer class="bg-primary text-white text-center p-3">
@@ -164,7 +184,6 @@
     </div>
   </footer>
 
-    <!-- Info Modal -->
     <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -191,10 +210,14 @@
     <script src="/script.js"></script>
     <script>
       document.getElementById('weatherForm').addEventListener('submit', function (event) {
-          event.preventDefault();
-          const city = document.getElementById('cityName').value;
-          fetchWeather(city); // Fetch current weather data
-          fetch14DayWeatherForecast(city); // Fetch 14-day forecast data and populate the table
+          if (document.getElementById('cityName').disabled) {
+              event.preventDefault();
+              $('#adminAlertModal').modal('show');
+          } else {
+              const city = document.getElementById('cityName').value;
+              fetchWeather(city);
+              fetch14DayWeatherForecast(city);
+          }
       });
     </script>
 </body>

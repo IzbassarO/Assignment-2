@@ -6,12 +6,11 @@ const { MongoClient } = require('mongodb');
 const session = require('express-session');
 const { default: mongoose } = require('mongoose');
 const User = require('./models/User');
-const SearchLog = require('./models/SearchLog'); // Adjust the path as necessary
+const SearchLog = require('./models/SearchLog');
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'; // It's better to use an environment variable for security
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const app = express();
 
-// MongoDB URI and Client
 const uri = "mongodb+srv://boy:0000@cluster0.0quzlca.mongodb.net/BackEnd?retryWrites=true&w=majority";
 
 // Database connection
@@ -41,7 +40,6 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-// Register Route
 app.get('/register', (req, res) => {
   res.render('register');
 });
@@ -73,7 +71,6 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Graceful shutdown
 process.on('SIGINT', () => {
   client.close(() => {
       console.log('MongoDB disconnected on app termination');
@@ -87,7 +84,7 @@ app.get('/', async (req, res) => {
   } else {
     try {
       const apiKey = 'eb487c460284448691cbd0930d6d45c8';
-      let city = 'Astana'; // Default city
+      let city = 'Astana';
 
       if (req.session.user.lastSearchedCity) {
         city = req.session.user.lastSearchedCity;
@@ -122,10 +119,8 @@ app.get('/searchlogs', async (req, res) => {
   const usernameQuery = req.query.username || req.session.user.username;
 
   try {
-    // Fetch data from the 'searchlogs' collection
     const searchLogs = await SearchLog.find({ username: usernameQuery });
 
-    // Render the 'searchlogs' template and pass the 'searchLogs' data to it
     res.render('searchlogs', { searchLogs: searchLogs, queryUsername: usernameQuery, isAdmin: isAdmin });
   } catch (error) {
     console.error('Error fetching search logs:', error);
@@ -141,7 +136,6 @@ app.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Check if admin
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       req.session.user = { username, isAdmin: true };
       return res.redirect('/admin');
@@ -157,7 +151,7 @@ app.post('/login', async (req, res) => {
       return;
     }
 
-    req.session.user = user; // Save user data in session
+    req.session.user = user;
     res.redirect('/');
   } catch (error) {
     console.error(error);
@@ -167,7 +161,6 @@ app.post('/login', async (req, res) => {
 
 app.post('/', async (req, res) => {
     try {
-        //Weather bit const apiKey = 'eb487c460284448691cbd0930d6d45c8';
         const cityName = req.body.cityName;
         const apiKey = 'https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric'
 
@@ -246,7 +239,7 @@ app.post('/search-weather', async (req, res) => {
     const user = await User.findOne({ username: req.session.user.username });
 
     const newLog = new SearchLog({
-        firstName: user.firstName, // Ensure these are correctly mapped.
+        firstName: user.firstName,
         lastName: user.lastName,
         username: user.username,
         citySearched: cityName,
@@ -269,10 +262,8 @@ app.get('/searchlogs', async (req, res) => {
   }
   
   try {
-    // Fetch data from the 'searchlogs' collection
     const searchLogs = await SearchLog.find({ username: req.session.user.username });
 
-    // Render a template to display the fetched data
     res.render('searchlogs', { searchLogs: searchLogs });
   } catch (error) {
     console.error('Error fetching search logs:', error);
@@ -302,18 +293,15 @@ app.get('/admin', isAdmin, async (req, res) => {
 app.post('/admin/adduser', isAdmin, async (req, res) => {
   const { username, password } = req.body;
   try {
-      // Check if user already exists
       const existingUser = await User.findOne({ username });
       if (existingUser) {
           return res.status(400).send('Username already exists');
       }
 
-      // Create a new user with hashed password
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new User({ username, password: hashedPassword });
       await newUser.save();
 
-      // Redirect back to the admin page
       res.redirect('/admin');
   } catch (error) {
       console.error('Error creating user:', error);
@@ -326,10 +314,8 @@ app.post('/admin/edituser/:userId', isAdmin, async (req, res) => {
     const { userId } = req.params;
     const { username /* other fields */ } = req.body;
 
-    // Update user in the database
     await User.findByIdAndUpdate(userId, { username /* other fields */ });
 
-    // Redirect or send a success message
     res.redirect('/admin');
   } catch (error) {
     console.error('Error updating user:', error);
@@ -343,34 +329,13 @@ app.post('/admin/deleteuser/:userId', isAdmin, async (req, res) => {
   res.redirect('/admin');
 });
 
-// app.post('/api/request', async (req, res) => {
-//   const responseData = await someApiCallFunction();
-  
-//   const newHistory = new History({
-//     username: req.session.user.username,
-//     apiName: 'Some API',
-//     requestData: req.body, // or any other request data
-//     responseData: responseData,
-//   });
-
-//   await newHistory.save();
-
-//   res.send(responseData);
-// });
-
-// app.get('/history', async (req, res) => {
-//   const historyLogs = await History.find({ username: req.session.user.username });
-//   res.render('history', { historyLogs: historyLogs });
-// });
-// Logout route
 app.get('/logout', (req, res) => {
-  // Destroy the user's session to log them out
   req.session.destroy((err) => {
     if (err) {
       console.error('Error while logging out:', err);
       res.status(500).send('Error logging out');
     } else {
-      res.redirect('/login'); // Redirect to the login page after logout
+      res.redirect('/login');
     }
   });
 });
