@@ -98,14 +98,12 @@ function fetch14DayWeatherForecast(city) {
       });
 }
 
-
 function displayTomorrowIoData(data) {
   console.log(data);
   const temp = data.data.timelines[0].intervals[0].values.temperature;
   
   document.getElementById('tomorrowIoTemperature').textContent = `Temperature (Tomorrow.io): ${temp}°C`;
 }
-
 
 function display14DayWeatherForecast(data) {
   const forecastTableBody = document.getElementById('forecastTableBody');

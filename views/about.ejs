@@ -65,6 +65,11 @@
                 <li class="nav-ite">
                     <a class="nav-link" href="/searchlogs">History</a>
                 </li>
+                <% if (isAdmin) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin Panel</a>
+                    </li>
+                <% } %>
                 <li class="nav-item">
                   <a class="nav-link" href="/logout">Logout</a>
                 </li>

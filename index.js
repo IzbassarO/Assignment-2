@@ -48,9 +48,9 @@ app.get('/register', (req, res) => {
 
 app.post('/register', async (req, res) => {
   try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).send('Both fields are required');
+    const { firstName, lastName, username, password } = req.body;
+    if (!firstName || !lastName || !username || !password) {
+      return res.status(400).send('All fields are required');
     }
 
     const existingUser = await User.findOne({ username });
@@ -58,7 +58,13 @@ app.post('/register', async (req, res) => {
       return res.status(400).send('Username already exists');
     }
 
-    const user = new User({ username, password });
+    const user = new User({
+      firstName,
+      lastName,
+      username,
+      password
+    });
+
     await user.save();
     res.redirect('/login');
   } catch (error) {
@@ -88,11 +94,11 @@ app.get('/', async (req, res) => {
       }
 
       const apiUrl = `https://api.weatherbit.io/v2.0/current?city=${city}&key=${apiKey}&units=metric`;
-
+      const isAdmin = req.session.user.isAdmin || false;
       const response = await axios.get(apiUrl);
       const weatherData = response.data;
 
-      res.render('index', { data: weatherData });
+      res.render('index', { data: weatherData, isAdmin: isAdmin });
     } catch (error) {
       console.error('Error fetching weather data:', error);
       res.status(500).send('Error fetching weather data');
@@ -101,21 +107,26 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/about', (req, res) => {
-    res.render('about');
+  const isAdmin = req.session.user.isAdmin || false;
+  
+  res.render('about', { isAdmin: isAdmin });
 })
 
 app.get('/searchlogs', async (req, res) => {
   if (!req.session.user) {
-    res.redirect('/login');
+    res.redirect('/login', );
     return;
   }
+  const isAdmin = req.session.user.isAdmin || false;
+
+  const usernameQuery = req.query.username || req.session.user.username;
 
   try {
     // Fetch data from the 'searchlogs' collection
-    const searchLogs = await SearchLog.find({ username: req.session.user.username });
+    const searchLogs = await SearchLog.find({ username: usernameQuery });
 
     // Render the 'searchlogs' template and pass the 'searchLogs' data to it
-    res.render('searchlogs', { searchLogs: searchLogs });
+    res.render('searchlogs', { searchLogs: searchLogs, queryUsername: usernameQuery, isAdmin: isAdmin });
   } catch (error) {
     console.error('Error fetching search logs:', error);
     res.status(500).send('Error fetching search logs');
@@ -159,7 +170,6 @@ app.post('/', async (req, res) => {
         //Weather bit const apiKey = 'eb487c460284448691cbd0930d6d45c8';
         const cityName = req.body.cityName;
         const apiKey = 'https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric'
-
 
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
         const response = await axios.get(apiUrl);
@@ -232,17 +242,20 @@ app.post('/search-weather', async (req, res) => {
     const weatherData = response.data;
 
     console.log('City Name:', cityName);
-    
+
+    const user = await User.findOne({ username: req.session.user.username });
+
     const newLog = new SearchLog({
-      username: req.session.user.username,
-      citySearched: cityName,
-      searchTime: new Date(),
-      weatherData: weatherData
-    });
-
-    await newLog.save();
-
-    res.render('index', { data: weatherData });
+        firstName: user.firstName, // Ensure these are correctly mapped.
+        lastName: user.lastName,
+        username: user.username,
+        citySearched: cityName,
+        searchTime: new Date(),
+        weatherData
+      });
+      
+      await newLog.save();
+      res.render('index', { data: weatherData });
   } catch (error) {
     console.error('Error in search weather:', error);
     res.status(500).send('Error processing your request');
@@ -254,7 +267,7 @@ app.get('/searchlogs', async (req, res) => {
     res.redirect('/login');
     return;
   }
-
+  
   try {
     // Fetch data from the 'searchlogs' collection
     const searchLogs = await SearchLog.find({ username: req.session.user.username });

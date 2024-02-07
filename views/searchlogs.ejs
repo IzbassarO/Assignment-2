@@ -45,6 +45,11 @@
                 <li class="nav-ite active">
                     <a class="nav-link" href="/searchlogs">History</a>
                 </li>
+                <% if (isAdmin) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin Panel</a>
+                    </li>
+                <% } %>
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">Logout</a>
                 </li>
@@ -55,23 +60,37 @@
     
     <h1>Search Logs</h1>
 
+    <% if (isAdmin) { %>
+        <div class="filter-form">
+            <form action="/searchlogs" method="get">
+                <div class="form-group">
+                    <label for="username">Filter by Username:</label>
+                    <input type="text" id="username" name="username" placeholder="Enter username">
+                </div>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+        </div>
+    <% } %>
+
     <table class="table">
         <thead>
             <tr>
-                <th>Object ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
                 <th>Search Time</th>
-                <th>Approximate temperature</th>
+                <th>Approximate Temperature</th>
                 <th>Clouds</th>
                 <th>Latitude</th>
-                <th>Longtitude</th>
+                <th>Longitude</th>
             </tr>
         </thead>
         <tbody>
             <p>Number of Logs: <%= searchLogs.length %></p>
-
+    
             <% searchLogs.forEach((log) => { %>
                 <tr>
-                    <td><%= log._id %></td>
+                    <td><%= log.firstName %></td>
+                    <td><%= log.lastName %></td>
                     <td><%= log.searchTime %></td>
                     <td><%= log.weatherData.data[0].app_temp %></td>
                     <td><%= log.weatherData.data[0].clouds %></td>
