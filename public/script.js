@@ -154,6 +154,9 @@ function display14DayWeatherForecast(data) {
 
     forecastTableBody.appendChild(row);
   });
+
+  displayForecastChart(data);
+  displayHumidityChart(data);
 }
 
 function initMap(lat, lon) {
@@ -182,9 +185,64 @@ document.getElementById('weatherForm').addEventListener('submit', function(event
   const city = document.getElementById('cityName').value;
   axios.post('/', { cityName: city })
     .then(response => {
-      
+
     })
     .catch(error => {
       console.error("Error submitting weather search:", error);
     });
 });
+
+function displayForecastChart(forecastData) {
+  const ctx = document.getElementById('weatherForecastChart').getContext('2d');
+  const dates = forecastData.data.map(day => day.valid_date);
+  const temperatures = forecastData.data.map(day => day.max_temp);
+
+  const chart = new Chart(ctx, {
+      type: 'line', // Change this to 'bar' for a bar chart
+      data: {
+          labels: dates,
+          datasets: [{
+              label: 'Max Temperature (°C)',
+              data: temperatures,
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+          scales: {
+              y: {
+                  beginAtZero: false
+              }
+          }
+      }
+  });
+}
+
+function displayHumidityChart(forecastData) {
+  const ctx = document.getElementById('humidityForecastChart').getContext('2d');
+  const dates = forecastData.data.map(day => day.valid_date);
+  const humidityLevels = forecastData.data.map(day => day.rh); // Assume `rh` is the field for relative humidity
+
+  const humidityChart = new Chart(ctx, {
+    type: 'bar', // Use a bar chart for humidity levels
+    data: {
+        labels: dates,
+        datasets: [{
+            label: 'Average Humidity (%)',
+            data: humidityLevels,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                suggestedMax: 100 // As humidity is in percentage
+            }
+        }
+    }
+  });
+}

@@ -22,7 +22,7 @@
       }
 
       #map {
-          height: 600px;
+          height: 400px;
       }
       .weather-icon {
         width: 30px;
@@ -107,6 +107,10 @@
       </div>
     </div>
 
+    <div class="container">
+      <canvas id="weatherForecastChart"></canvas>
+    </div>
+
   <div class="card mb-3">
     <div class="card-header">
       Weatherbit Data
@@ -125,6 +129,11 @@
       <h5 class="card-title" id="tomorrowIoTemperature">Temperature (Tomorrow.io): --</h5>
     </div>
   </div>
+
+  <div class="container">
+    <h3>Humidity Forecast</h3>
+    <canvas id="humidityForecastChart"></canvas>
+  </div>  
 
   <div class="container" id="weatherContainer">
     <% if (data && data.data && data.data.length > 0) { %>
@@ -208,6 +217,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/script.js"></script>
     <script>
       document.getElementById('weatherForm').addEventListener('submit', function (event) {
