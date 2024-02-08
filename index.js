@@ -7,6 +7,8 @@ const session = require('express-session');
 const { default: mongoose } = require('mongoose');
 const User = require('./models/User');
 const SearchLog = require('./models/SearchLog');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const app = express();
@@ -28,6 +30,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('views'));
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(session({
   secret: 'your_secret_key',
   resave: false,
@@ -59,7 +62,7 @@ app.post('/register', async (req, res) => {
     const user = new User({
       firstName,
       lastName,
-      username,
+      cityName,
       password
     });
 
@@ -84,7 +87,7 @@ app.get('/', async (req, res) => {
   } else {
     try {
       const apiKey = 'eb487c460284448691cbd0930d6d45c8';
-      let city = 'Astana';
+      let city = req.body.cityName
 
       if (req.session.user.lastSearchedCity) {
         city = req.session.user.lastSearchedCity;
@@ -161,14 +164,28 @@ app.post('/login', async (req, res) => {
 
 app.post('/', async (req, res) => {
     try {
-        const cityName = req.body.cityName;
-        const apiKey = 'https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric'
-
+        const city = req.body.cityName;
+        const apiKey = '9b1c5b4d3e84daa2bc0243525697b68a'
+        console.log("City received:", city);
         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
         const response = await axios.get(apiUrl);
         const weatherData = response.data;
+        const isAdmin = req.session.user.isAdmin;
 
-        res.render('index', { data: weatherData });
+        const user = await User.findOne({ username: req.session.user.username });
+        const newLog = new SearchLog({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          citySearched: city,
+          searchTime: new Date(),
+          weatherData
+        });
+
+      console.log("New Log:", newLog);
+      
+      await newLog.save();
+      res.render('index', { data: weatherData, isAdmin: isAdmin });
     } catch (error) {
         console.error('Error fetching weather data:', error);
         res.status(500).send('Error fetching weather data');
@@ -200,7 +217,7 @@ app.get('/weatherbit/:city', async (req, res) => {
     const weatherbitApiKey = "eb487c460284448691cbd0930d6d45c8";
     try {
       const response = await axios.get(`https://api.weatherbit.io/v2.0/current?city=${city}&key=${weatherbitApiKey}`);
-      console.log(response.data);
+//      console.log(response.data);
       res.json(response.data);
     } catch (error) {
       console.error("Error fetching Weatherbit data:", error);
@@ -220,41 +237,6 @@ app.get('/weatherbit/forecast/:city', async (req, res) => {
     }
 });
 
-app.post('/search-weather', async (req, res) => {
-  if (!req.session.user) {
-    res.redirect('/login');
-    return;
-  }
-
-  try {
-    const cityName = req.body.cityName;
-    const apiKey = 'eb487c460284448691cbd0930d6d45c8';
-    const apiUrl = `https://api.weatherbit.io/v2.0/current?city=${cityName}&key=${apiKey}&units=metric`;
-    
-    const response = await axios.get(apiUrl);
-    const weatherData = response.data;
-
-    console.log('City Name:', cityName);
-
-    const user = await User.findOne({ username: req.session.user.username });
-
-    const newLog = new SearchLog({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username: user.username,
-        citySearched: cityName,
-        searchTime: new Date(),
-        weatherData
-      });
-      
-      await newLog.save();
-      res.render('index', { data: weatherData });
-  } catch (error) {
-    console.error('Error in search weather:', error);
-    res.status(500).send('Error processing your request');
-  }
-});
-
 app.get('/searchlogs', async (req, res) => {
   if (!req.session.user) {
     res.redirect('/login');
@@ -270,7 +252,6 @@ app.get('/searchlogs', async (req, res) => {
     res.status(500).send('Error fetching search logs');
   }
 });
-
 
 function isAdmin(req, res, next) {
   if (req.session.user && req.session.user.isAdmin) {
@@ -338,4 +319,45 @@ app.get('/logout', (req, res) => {
       res.redirect('/login');
     }
   });
+});
+
+app.get('/download-search-logs', async (req, res) => {
+  if (!req.session.user) {
+      return res.redirect('/login');
+  }
+  
+  const searchLogs = await SearchLog.find({ username: req.session.user.username });
+
+  const doc = new PDFDocument();
+  res.setHeader('Content-disposition', 'attachment; filename="SearchLogs.pdf"');
+  res.setHeader('Content-type', 'application/pdf');
+  doc.pipe(res);
+
+  searchLogs.forEach(log => {
+    const searchTime = log.searchTime ? new Date(log.searchTime).toLocaleString() : 'N/A';
+
+    doc.fontSize(14).text(`User: ${log.firstName} ${log.lastName} (${log.username})`, { underline: true });
+    doc.fontSize(10).text(`Search Time: ${searchTime}`);
+
+    if (log.weatherData && log.weatherData.weather && log.weatherData.weather.length > 0) {
+        const data = log.weatherData;
+        const temp = data.main.temp;
+        const clouds = data.clouds.all;
+        const lat = data.coord.lat;
+        const lon = data.coord.lon;
+
+        doc.fontSize(10).text(`City Searched: ${data.name}`);
+        doc.fontSize(10).text(`Approximate Temperature: ${temp}°C`);
+        doc.fontSize(10).text(`Clouds: ${clouds}%`);
+        doc.fontSize(10).text(`Latitude: ${lat}`);
+        doc.fontSize(10).text(`Longitude: ${lon}`);
+        // ... add more fields as necessary ...
+    } else {
+        doc.fontSize(10).text('No weather data available.');
+    }
+
+    doc.text('-----------------------');
+  });
+
+  doc.end();
 });

@@ -180,9 +180,9 @@ function displayWeatherIcons(forecastData) {
 document.getElementById('weatherForm').addEventListener('submit', function(event) {
   event.preventDefault();
   const city = document.getElementById('cityName').value;
-  axios.post('/search-weather', { cityName: city })
+  axios.post('/', { cityName: city })
     .then(response => {
-      // Update UI
+      
     })
     .catch(error => {
       console.error("Error submitting weather search:", error);

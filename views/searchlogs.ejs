@@ -74,11 +74,15 @@
     <% } %>
 
     <table class="table">
+        <% if (!isAdmin) { %>
+            <p>Download All Data: <a href="/download-search-logs" class="btn btn-primary">Download</a></p>
+        <% } %>
         <thead>
             <tr>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Search Time</th>
+                <th>City</th>
                 <th>Approximate Temperature</th>
                 <th>Clouds</th>
                 <th>Latitude</th>
@@ -87,18 +91,19 @@
         </thead>
         <tbody>
             <p>Number of Logs: <%= searchLogs.length %></p>
-    
+
             <% searchLogs.forEach((log) => { %>
                 <tr>
                     <td><%= log.firstName %></td>
                     <td><%= log.lastName %></td>
-                    <td><%= log.searchTime %></td>
-                    <td><%= log.weatherData.data[0].app_temp %></td>
-                    <td><%= log.weatherData.data[0].clouds %></td>
-                    <td><%= log.weatherData.data[0].lat %></td>
-                    <td><%= log.weatherData.data[0].lon %></td>
-                </tr>
-            <% }); %>
+                    <td><%= new Date(log.searchTime).toLocaleString() %></td>
+                    <td><%= log.citySearched %></td>
+                    <td><%= log.weatherData.main.temp %>°C</td>
+                    <td><%= log.weatherData.clouds.all %>%</td>
+                    <td><%= log.weatherData.coord.lat %></td>
+                    <td><%= log.weatherData.coord.lon %></td>
+        </tr>
+    <% }); %>
         </tbody>
     </table>
   </div>
