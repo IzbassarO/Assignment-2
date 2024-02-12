@@ -4,25 +4,22 @@
     <title>Weather App</title>
     <link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
 
     <style>
       #weatherContainer {
           display: flex;
       }
 
+      #map {
+        height: 400px; /* Example height */
+        width: 100%; /* Example width */
+      }
+
       #weatherTable {
           flex: 1;
-      }
-
-      .map-container {
-          flex: 2; 
-          padding-left: 20px;
-      }
-
-      #map {
-          height: 400px;
       }
       .weather-icon {
         width: 30px;
@@ -93,68 +90,24 @@
                   <li class="list-group-item" id="weatherHumidity">Humidity: --</li>
                   <li class="list-group-item" id="weatherPressure">Pressure: --</li>
                   <li class="list-group-item" id="weatherClouds">Cloudiness: --</li>
-                  <li class="list-group-item" id="weatherSunrise">Sunrise: --</li>
-                  <li class="list-group-item" id="weatherSunset">Sunset: --</li>
               </ul>
           </div>
       </div>
 
-      <div class="card mb-3 map-container">
-          <div class="card-header">
-              Map
-          </div>
-          <div id="map"></div>
-      </div>
+      <div id="map" class="mb-4" style="height: 400px; width: 500px;"></div>
     </div>
 
     <div class="container">
-      <canvas id="weatherForecastChart"></canvas>
+      <canvas id="humidityChart"></canvas>
     </div>
-
-  <div class="card mb-3">
-    <div class="card-header">
-      Weatherbit Data
-    </div>
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item" id="weatherbitTemperature">Temperature (Weatherbit): --</li>
-      <li class="list-group-item" id="weatherbitDescription">Description (Weatherbit): --</li>
-    </ul>
-  </div>
-
-  <div class="card mb-3">
-    <div class="card-header">
-      Tomorrow.io Weather Data
-    </div>
-    <div class="card-body">
-      <h5 class="card-title" id="tomorrowIoTemperature">Temperature (Tomorrow.io): --</h5>
-    </div>
-  </div>
 
   <div class="container">
     <h3>Humidity Forecast</h3>
     <canvas id="humidityForecastChart"></canvas>
   </div>  
 
-  <div class="container" id="weatherContainer">
-    <% if (data && data.data && data.data.length > 0) { %>
-      <table class="table">
-        <thead>
-          <% data.data.forEach((day, index) => { %>
-            <tr>
-              <td>Valid date</td>
-              <td>Minimum temperature(°C) / Maximum temperature(°C)</td>
-              <td>Wind speed (m/s)</td>
-              <td>Relative Humidity</td>
-              <td>Weather Icon</td>
-            </tr>
-          <% }); %>
-        </thead>
-        <tbody id="forecastTableBody">
-        </tbody>
-      </table>
-    <% } else { %>
-      <p>No weather data available.</p>
-    <% } %>
+  <div id="forecastContainer">
+    
   </div>
 
 <div class="modal fade" id="adminAlertModal" tabindex="-1" role="dialog" aria-labelledby="adminAlertModalLabel" aria-hidden="true">
@@ -213,9 +166,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/script.js"></script>
@@ -228,7 +179,7 @@
               const city = document.getElementById('cityName').value;
               fetchWeather(city);
               fetch14DayWeatherForecast(city);
-          }
+            }
       });
     </script>
 </body>

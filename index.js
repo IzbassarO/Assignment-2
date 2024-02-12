@@ -62,7 +62,7 @@ app.post('/register', async (req, res) => {
     const user = new User({
       firstName,
       lastName,
-      cityName,
+      username,
       password
     });
 
@@ -81,30 +81,16 @@ process.on('SIGINT', () => {
   });
 });
 
-app.get('/', async (req, res) => {
-  if (!req.session.user) {
-    res.redirect('/login');
-  } else {
-    try {
-      const apiKey = 'eb487c460284448691cbd0930d6d45c8';
-      let city = req.body.cityName
+app.get('/', checkAuthenticated, async (req, res) => {
+  try {
+    const isAdmin = req.session.user?.isAdmin || false;
 
-      if (req.session.user.lastSearchedCity) {
-        city = req.session.user.lastSearchedCity;
-      }
-
-      const apiUrl = `https://api.weatherbit.io/v2.0/current?city=${city}&key=${apiKey}&units=metric`;
-      const isAdmin = req.session.user.isAdmin || false;
-      const response = await axios.get(apiUrl);
-      const weatherData = response.data;
-
-      res.render('index', { data: weatherData, isAdmin: isAdmin });
-    } catch (error) {
-      console.error('Error fetching weather data:', error);
-      res.status(500).send('Error fetching weather data');
-    }
+    res.render('index', {isAdmin: isAdmin});
+  } catch (error) {
+    console.error('Error fetching weather data:', error);
   }
 });
+
 
 app.get('/about', (req, res) => {
   const isAdmin = req.session.user.isAdmin || false;
@@ -136,6 +122,7 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
+  console.log("Login attempt for user:", req.body.username);
   try {
     const { username, password } = req.body;
 
@@ -153,9 +140,11 @@ app.post('/login', async (req, res) => {
       res.render('login', { message: 'Invalid username or password' });
       return;
     }
-
     req.session.user = user;
-    res.redirect('/');
+    req.session.save(err => {
+      if (err) throw err;
+      res.redirect('/');
+    });
   } catch (error) {
     console.error(error);
     res.status(500).render('login', { message: 'Server error' });
@@ -192,49 +181,37 @@ app.post('/', async (req, res) => {
     }
 });
 
-app.get('/climacell/:lat/:lon', async (req, res) => {
-    const { lat, lon } = req.params;
-    const climacellApiKey = "eAug0eZBRrEu5tfx54VMicw8gb6B1KyB";
-    try {
-      const response = await axios.get(`https://api.tomorrow.io/v4/timelines`, {
-        params: {
-          location: `${lat},${lon}`,
-          fields: ['temperature', 'weatherCode', 'precipitationIntensity'],
-          timesteps: ['1h'],
-          units: 'metric',
-          apikey: climacellApiKey,
-        }
+app.get('/aqi/:latitude/:longitude', async (req, res) => {
+  const { latitude, longitude } = req.params;
+  const apiKey = 'bdf8ead6-a40a-459e-a3a9-6440e3c8d5f5';
+
+  try {
+    const response = await axios.get(`http://api.example.com/aqi?lat=${latitude}&lon=${longitude}&key=${apiKey}`);
+    const aqiData = response.data;
+    res.json(aqiData);
+  } catch (error) {
+    console.error("Error fetching AQI data:", error);
+    res.status(500).send("Error fetching AQI data");
+  }
+});
+
+
+app.get('/forecast/:latitude/:longitude', async (req, res) => {
+  const { latitude, longitude } = req.params;
+  try {
+      const response = await axios.get(`https://api.open-meteo.com/v1/forecast`, {
+          params: {
+              latitude: latitude,
+              longitude: longitude,
+              daily: ['temperature_2m_max', 'temperature_2m_min', 'weathercode'],
+              timezone: 'auto'
+          }
       });
       res.json(response.data);
-    } catch (error) {
-      console.error("Error fetching Tomorrow.io data:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-app.get('/weatherbit/:city', async (req, res) => {
-    const city = req.params.city;
-    const weatherbitApiKey = "eb487c460284448691cbd0930d6d45c8";
-    try {
-      const response = await axios.get(`https://api.weatherbit.io/v2.0/current?city=${city}&key=${weatherbitApiKey}`);
-//      console.log(response.data);
-      res.json(response.data);
-    } catch (error) {
-      console.error("Error fetching Weatherbit data:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-app.get('/weatherbit/forecast/:city', async (req, res) => {
-    const city = req.params.city;
-    const weatherbitApiKey = "eb487c460284448691cbd0930d6d45c8";
-    try {
-        const response = await axios.get(`https://api.weatherbit.io/v2.0/forecast/daily?city=${city}&key=${weatherbitApiKey}&days=16`);
-        res.json(response.data);
-    } catch (error) {
-        console.error("Error fetching Weatherbit forecast data:", error);
-        res.status(500).json({ error: error.message });
-    }
+  } catch (error) {
+      console.error("Error fetching 14-day forecast data:", error);
+      res.status(500).send("Error fetching forecast data");
+  }
 });
 
 app.get('/searchlogs', async (req, res) => {
@@ -272,7 +249,7 @@ app.get('/admin', isAdmin, async (req, res) => {
 });
 
 app.post('/admin/adduser', isAdmin, async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, firstName, lastName } = req.body;
   try {
       const existingUser = await User.findOne({ username });
       if (existingUser) {
@@ -280,7 +257,7 @@ app.post('/admin/adduser', isAdmin, async (req, res) => {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = new User({ username, password: hashedPassword });
+      const newUser = new User({ username, password: hashedPassword, firstName, lastName });
       await newUser.save();
 
       res.redirect('/admin');
@@ -361,3 +338,10 @@ app.get('/download-search-logs', async (req, res) => {
 
   doc.end();
 });
+function checkAuthenticated(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+}
