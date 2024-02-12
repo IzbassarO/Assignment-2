@@ -102,7 +102,7 @@ function displayAQIData(aqiLevel) {
 function display14DayWeatherForecast(forecastData) {
   const ctx = document.getElementById('humidityForecastChart').getContext('2d');
   const labels = forecastData.map(day => day.date);
-  const temps = forecastData.map(day => day.day.maxtemp_c); // Example: Plotting max temperature
+  const temps = forecastData.map(day => day.day.maxtemp_c);
 
   const tempChart = new Chart(ctx, {
       type: 'line',
@@ -125,6 +125,45 @@ function display14DayWeatherForecast(forecastData) {
           }
       }
   });
+
+  const forecastContainer = document.getElementById('forecastContainer');
+  forecastContainer.innerHTML = '';
+
+  const table = document.createElement('table');
+  table.className = 'table table-hover';
+
+  const thead = document.createElement('thead');
+  thead.innerHTML = `
+    <tr class="table-dark">
+      <th>Date</th>
+      <th>Condition</th>
+      <th>High / Low</th>
+      <th>Wind</th>
+      <th>Humidity</th>
+      <th>Description</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+
+  // Add table body
+  const tbody = document.createElement('tbody');
+  forecastData.forEach(day => {
+    const tr = document.createElement('tr');
+    const iconUrl = `https:${day.day.condition.icon}`;
+    tr.innerHTML = `
+      <td>${day.date}</td>
+      <td><img src="${iconUrl}" class="weather-icon"> ${day.day.condition.text}</td>
+      <td>${day.day.maxtemp_c}°C / ${day.day.mintemp_c}°C</td>
+      <td>${day.day.maxwind_kph} kph</td>
+      <td>${day.day.avghumidity}%</td>
+      <td>${day.day.condition.text}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+
+
+  forecastContainer.appendChild(table);
 }
 
 function fetch14DayWeatherForecast(city) {

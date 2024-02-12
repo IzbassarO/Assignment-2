@@ -35,6 +35,26 @@
           color: white;
           text-align: center;
       }
+      .weather-icon {
+  width: 20px; /* Adjust size as needed */
+  height: 20px; /* Adjust size as needed */
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f5f5f5; /* Light grey on hover */
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #dee2e6 !important; /* Ensuring consistent border */
+}
+
+.thead-dark th {
+  background-color: #343a40; /* Bootstrap dark background */
+  color: white; /* Text color */
+}
     </style>
 </head>
 <body>
@@ -120,7 +140,7 @@
         </button>
       </div>
       <div class="modal-body">
-        Admins cannot perform weather searches. Blame the developer Izbassar that wanted so :)
+        Why Admin needs to use search weather data about city name. Admin can create a user and use it :)
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -171,6 +191,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/script.js"></script>
     <script>
+      var isAdmin = <%- JSON.stringify(isAdmin) %>;
+    </script>
+    <script>
       document.getElementById('weatherForm').addEventListener('submit', function (event) {
           if (document.getElementById('cityName').disabled) {
               event.preventDefault();
@@ -181,6 +204,18 @@
               fetch14DayWeatherForecast(city);
             }
       });
+      document.getElementById('weatherForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Always prevent default to control the flow based on isAdmin status
+    if (isAdmin) {
+        // If the user is an admin, show the modal and don't submit the form
+        $('#adminAlertModal').modal('show');
+    } else {
+        // If the user is not an admin, proceed with fetching weather
+        const city = document.getElementById('cityName').value;
+        fetchWeather(city);
+        fetch14DayWeatherForecast(city);
+    }
+});
     </script>
 </body>
 </html>

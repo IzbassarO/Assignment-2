@@ -32,10 +32,10 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-  secret: 'your_secret_key',
+  secret: 'your secret key',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }
+  cookie: { secure: !true }
 }));
 const PORT = process.env.PORT || 3000;
 
@@ -93,10 +93,9 @@ app.get('/', checkAuthenticated, async (req, res) => {
 
 
 app.get('/about', (req, res) => {
-  const isAdmin = req.session.user.isAdmin || false;
-  
+  const isAdmin = req.session?.user?.isAdmin || false;
   res.render('about', { isAdmin: isAdmin });
-})
+});
 
 app.get('/searchlogs', async (req, res) => {
   if (!req.session.user) {
@@ -145,6 +144,7 @@ app.post('/login', async (req, res) => {
       if (err) throw err;
       res.redirect('/');
     });
+    
   } catch (error) {
     console.error(error);
     res.status(500).render('login', { message: 'Server error' });
