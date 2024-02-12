@@ -97,6 +97,7 @@ app.get('/about', (req, res) => {
   res.render('about', { isAdmin: isAdmin });
 });
 
+
 app.get('/searchlogs', async (req, res) => {
   if (!req.session.user) {
     res.redirect('/login', );
@@ -256,10 +257,14 @@ app.post('/admin/adduser', isAdmin, async (req, res) => {
           return res.status(400).send('Username already exists');
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = new User({ username, password: hashedPassword, firstName, lastName });
-      await newUser.save();
-
+      const user = new User({
+        firstName,
+        lastName,
+        username,
+        password
+      });
+  
+      await user.save();
       res.redirect('/admin');
   } catch (error) {
       console.error('Error creating user:', error);
